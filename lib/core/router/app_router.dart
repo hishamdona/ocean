@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
+import '../../features/splash/presentation/pages/splash_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/auth/presentation/pages/otp_page.dart';
 import '../../features/auth/presentation/pages/seller_registration_page.dart';
 import '../../features/main/presentation/pages/main_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -23,15 +26,17 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
   
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     redirect: (context, state) {
-      final isLoggedIn = authState.when(
-        data: (user) => user != null,
-        loading: () => false,
-        error: (_, __) => false,
-      );
-      
+      final isLoggedIn = authState != null;
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
+      final isSplashRoute = state.matchedLocation == '/splash';
+      final isOnboardingRoute = state.matchedLocation == '/onboarding';
+      
+      // Allow splash and onboarding routes
+      if (isSplashRoute || isOnboardingRoute) {
+        return null;
+      }
       
       if (!isLoggedIn && !isAuthRoute) {
         return '/auth/login';
@@ -44,6 +49,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      // Splash Route
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashPage(),
+      ),
+      
+      // Onboarding Route
+      GoRoute(
+        path: '/onboarding',
+        name: 'onboarding',
+        builder: (context, state) => const OnboardingPage(),
+      ),
+      
       // Auth Routes
       GoRoute(
         path: '/auth/login',
@@ -54,6 +73,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/auth/register',
         name: 'register',
         builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: '/auth/otp',
+        name: 'otp',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return OTPPage(
+            email: extra?['email'] ?? '',
+            userId: extra?['userId'] ?? '',
+          );
+        },
       ),
       GoRoute(
         path: '/auth/seller-registration',

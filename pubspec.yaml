@@ -34,14 +34,6 @@ dependencies:
   retrofit: ^4.0.3
   json_annotation: ^4.8.1
   
-  # Authentication
-  firebase_auth: ^4.15.3
-  firebase_core: ^2.24.2
-  
-  # Real-time Features
-  firebase_messaging: ^14.7.10
-  cloud_firestore: ^4.13.6
-  
   # Media & Files
   image_picker: ^1.0.4
   file_picker: ^6.1.1
@@ -93,3 +85,6 @@ flutter:
           weight: 600
         - asset: assets/fonts/Poppins-Bold.ttf
           weight: 700
+    - family: LeckerliOne
+      fonts:
+        - asset: assets/fonts/LeckerliOne-Regular.ttf

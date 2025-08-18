@@ -28,12 +28,12 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.waves,
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               size: 20,
             ),
           ),

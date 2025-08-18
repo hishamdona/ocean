@@ -5,7 +5,7 @@ class AppTheme {
   // Colors
   static const Color primaryBlack = Color(0xFF000000);
   static const Color primaryWhite = Color(0xFFFFFFFF);
-  static const Color accentPurple = Color(0xFF8A2BE2);
+  static const Color accentCharcoal = Color(0xFF333333);
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
   static const Color lightGray = Color(0xFFF5F5F5);
@@ -26,7 +26,7 @@ class AppTheme {
       
       colorScheme: const ColorScheme.light(
         primary: primaryBlack,
-        secondary: accentPurple,
+        secondary: accentCharcoal,
         surface: primaryWhite,
         background: primaryWhite,
         error: error,
@@ -129,7 +129,7 @@ class AppTheme {
       
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: primaryWhite,
-        selectedItemColor: accentPurple,
+        selectedItemColor: accentCharcoal,
         unselectedItemColor: mediumGray,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
@@ -178,7 +178,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: accentPurple, width: 2),
+          borderSide: const BorderSide(color: accentCharcoal, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -200,7 +200,7 @@ class AppTheme {
       ),
       
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: accentPurple,
+        backgroundColor: accentCharcoal,
         foregroundColor: primaryWhite,
       ),
     );
@@ -215,7 +215,7 @@ class AppTheme {
       
       colorScheme: const ColorScheme.dark(
         primary: primaryWhite,
-        secondary: accentPurple,
+        secondary: accentCharcoal,
         surface: darkSurface,
         background: darkBackground,
         error: error,
@@ -318,7 +318,7 @@ class AppTheme {
       
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: darkSurface,
-        selectedItemColor: accentPurple,
+        selectedItemColor: accentCharcoal,
         unselectedItemColor: mediumGray,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
@@ -367,7 +367,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: accentPurple, width: 2),
+          borderSide: const BorderSide(color: accentCharcoal, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -389,7 +389,7 @@ class AppTheme {
       ),
       
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: accentPurple,
+        backgroundColor: accentCharcoal,
         foregroundColor: primaryWhite,
       ),
     );

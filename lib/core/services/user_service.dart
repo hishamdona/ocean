@@ -1,14 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 import '../models/user_model.dart';
 
 class UserService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String _collection = 'users';
+  static const String _usersKey = 'users_data';
 
   Future<User> createUser(User user) async {
     try {
-      await _firestore.collection(_collection).doc(user.id).set(user.toJson());
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString(_usersKey) ?? '{}';
+      final users = Map<String, dynamic>.from(json.decode(usersJson));
+      
+      users[user.id] = user.toJson();
+      await prefs.setString(_usersKey, json.encode(users));
+      
       return user;
     } catch (e) {
       throw Exception('Failed to create user: $e');
@@ -17,13 +23,15 @@ class UserService {
 
   Future<User> getUserById(String userId) async {
     try {
-      final doc = await _firestore.collection(_collection).doc(userId).get();
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString(_usersKey) ?? '{}';
+      final users = Map<String, dynamic>.from(json.decode(usersJson));
       
-      if (!doc.exists) {
+      if (!users.containsKey(userId)) {
         throw Exception('User not found');
       }
       
-      return User.fromJson(doc.data()!);
+      return User.fromJson(users[userId]);
     } catch (e) {
       throw Exception('Failed to get user: $e');
     }
@@ -31,7 +39,13 @@ class UserService {
 
   Future<User> updateUser(User user) async {
     try {
-      await _firestore.collection(_collection).doc(user.id).update(user.toJson());
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString(_usersKey) ?? '{}';
+      final users = Map<String, dynamic>.from(json.decode(usersJson));
+      
+      users[user.id] = user.toJson();
+      await prefs.setString(_usersKey, json.encode(users));
+      
       return user;
     } catch (e) {
       throw Exception('Failed to update user: $e');
@@ -40,7 +54,12 @@ class UserService {
 
   Future<void> deleteUser(String userId) async {
     try {
-      await _firestore.collection(_collection).doc(userId).delete();
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString(_usersKey) ?? '{}';
+      final users = Map<String, dynamic>.from(json.decode(usersJson));
+      
+      users.remove(userId);
+      await prefs.setString(_usersKey, json.encode(users));
     } catch (e) {
       throw Exception('Failed to delete user: $e');
     }
@@ -48,16 +67,17 @@ class UserService {
 
   Future<List<User>> searchUsers(String query, {int limit = 20}) async {
     try {
-      final querySnapshot = await _firestore
-          .collection(_collection)
-          .where('fullName', isGreaterThanOrEqualTo: query)
-          .where('fullName', isLessThan: query + 'z')
-          .limit(limit)
-          .get();
-
-      return querySnapshot.docs
-          .map((doc) => User.fromJson(doc.data()))
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString(_usersKey) ?? '{}';
+      final users = Map<String, dynamic>.from(json.decode(usersJson));
+      
+      final userList = users.values
+          .map((userData) => User.fromJson(userData))
+          .where((user) => user.fullName.toLowerCase().contains(query.toLowerCase()))
+          .take(limit)
           .toList();
+      
+      return userList;
     } catch (e) {
       throw Exception('Failed to search users: $e');
     }
@@ -65,40 +85,24 @@ class UserService {
 
   Future<void> followUser(String currentUserId, String targetUserId) async {
     try {
-      final batch = _firestore.batch();
+      // Simulate follow functionality with local storage
+      final prefs = await SharedPreferences.getInstance();
+      final followingKey = 'following_$currentUserId';
+      final followersKey = 'followers_$targetUserId';
       
-      // Add to current user's following
-      batch.set(
-        _firestore
-            .collection(_collection)
-            .doc(currentUserId)
-            .collection('following')
-            .doc(targetUserId),
-        {'followedAt': FieldValue.serverTimestamp()},
-      );
+      final followingJson = prefs.getString(followingKey) ?? '[]';
+      final followersJson = prefs.getString(followersKey) ?? '[]';
       
-      // Add to target user's followers
-      batch.set(
-        _firestore
-            .collection(_collection)
-            .doc(targetUserId)
-            .collection('followers')
-            .doc(currentUserId),
-        {'followedAt': FieldValue.serverTimestamp()},
-      );
+      final following = List<String>.from(json.decode(followingJson));
+      final followers = List<String>.from(json.decode(followersJson));
       
-      // Update counts
-      batch.update(
-        _firestore.collection(_collection).doc(currentUserId),
-        {'followingCount': FieldValue.increment(1)},
-      );
-      
-      batch.update(
-        _firestore.collection(_collection).doc(targetUserId),
-        {'followersCount': FieldValue.increment(1)},
-      );
-      
-      await batch.commit();
+      if (!following.contains(targetUserId)) {
+        following.add(targetUserId);
+        followers.add(currentUserId);
+        
+        await prefs.setString(followingKey, json.encode(following));
+        await prefs.setString(followersKey, json.encode(followers));
+      }
     } catch (e) {
       throw Exception('Failed to follow user: $e');
     }
@@ -106,38 +110,21 @@ class UserService {
 
   Future<void> unfollowUser(String currentUserId, String targetUserId) async {
     try {
-      final batch = _firestore.batch();
+      final prefs = await SharedPreferences.getInstance();
+      final followingKey = 'following_$currentUserId';
+      final followersKey = 'followers_$targetUserId';
       
-      // Remove from current user's following
-      batch.delete(
-        _firestore
-            .collection(_collection)
-            .doc(currentUserId)
-            .collection('following')
-            .doc(targetUserId),
-      );
+      final followingJson = prefs.getString(followingKey) ?? '[]';
+      final followersJson = prefs.getString(followersKey) ?? '[]';
       
-      // Remove from target user's followers
-      batch.delete(
-        _firestore
-            .collection(_collection)
-            .doc(targetUserId)
-            .collection('followers')
-            .doc(currentUserId),
-      );
+      final following = List<String>.from(json.decode(followingJson));
+      final followers = List<String>.from(json.decode(followersJson));
       
-      // Update counts
-      batch.update(
-        _firestore.collection(_collection).doc(currentUserId),
-        {'followingCount': FieldValue.increment(-1)},
-      );
+      following.remove(targetUserId);
+      followers.remove(currentUserId);
       
-      batch.update(
-        _firestore.collection(_collection).doc(targetUserId),
-        {'followersCount': FieldValue.increment(-1)},
-      );
-      
-      await batch.commit();
+      await prefs.setString(followingKey, json.encode(following));
+      await prefs.setString(followersKey, json.encode(followers));
     } catch (e) {
       throw Exception('Failed to unfollow user: $e');
     }
@@ -145,54 +132,14 @@ class UserService {
 
   Future<bool> isFollowing(String currentUserId, String targetUserId) async {
     try {
-      final doc = await _firestore
-          .collection(_collection)
-          .doc(currentUserId)
-          .collection('following')
-          .doc(targetUserId)
-          .get();
+      final prefs = await SharedPreferences.getInstance();
+      final followingKey = 'following_$currentUserId';
+      final followingJson = prefs.getString(followingKey) ?? '[]';
+      final following = List<String>.from(json.decode(followingJson));
       
-      return doc.exists;
+      return following.contains(targetUserId);
     } catch (e) {
       throw Exception('Failed to check follow status: $e');
     }
-  }
-
-  Stream<List<User>> getFollowers(String userId) {
-    return _firestore
-        .collection(_collection)
-        .doc(userId)
-        .collection('followers')
-        .snapshots()
-        .asyncMap((snapshot) async {
-      final followerIds = snapshot.docs.map((doc) => doc.id).toList();
-      
-      if (followerIds.isEmpty) return <User>[];
-      
-      final users = await Future.wait(
-        followerIds.map((id) => getUserById(id)),
-      );
-      
-      return users;
-    });
-  }
-
-  Stream<List<User>> getFollowing(String userId) {
-    return _firestore
-        .collection(_collection)
-        .doc(userId)
-        .collection('following')
-        .snapshots()
-        .asyncMap((snapshot) async {
-      final followingIds = snapshot.docs.map((doc) => doc.id).toList();
-      
-      if (followingIds.isEmpty) return <User>[];
-      
-      final users = await Future.wait(
-        followingIds.map((id) => getUserById(id)),
-      );
-      
-      return users;
-    });
   }
 }

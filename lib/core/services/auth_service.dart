@@ -1,115 +1,78 @@
-import 'package:firebase_auth/firebase_auth.dart';
-
 class AuthService {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
-  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
-
-  User? get currentUser => _firebaseAuth.currentUser;
-
-  Future<User> signInWithEmailAndPassword(String email, String password) async {
-    try {
-      final credential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      
-      if (credential.user == null) {
-        throw Exception('Sign in failed');
-      }
-      
-      return credential.user!;
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+  // Dummy user for testing
+  static const String _dummyEmail = 'test@ocean.com';
+  static const String _dummyPassword = 'password123';
+  
+  Future<Map<String, dynamic>> signInWithEmailAndPassword(String email, String password) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
+    
+    if (email == _dummyEmail && password == _dummyPassword) {
+      return {
+        'uid': 'dummy_user_123',
+        'email': email,
+        'success': true,
+      };
+    } else {
+      throw Exception('Invalid email or password');
     }
   }
 
-  Future<User> signUpWithEmailAndPassword(String email, String password) async {
-    try {
-      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      
-      if (credential.user == null) {
-        throw Exception('Sign up failed');
-      }
-      
-      return credential.user!;
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
+  Future<Map<String, dynamic>> signUpWithEmailAndPassword(String email, String password) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
+    
+    // Always succeed for demo purposes
+    return {
+      'uid': 'dummy_user_${DateTime.now().millisecondsSinceEpoch}',
+      'email': email,
+      'success': true,
+    };
   }
 
   Future<void> signOut() async {
-    try {
-      await _firebaseAuth.signOut();
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   Future<void> resetPassword(String email) async {
-    try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   Future<void> updatePassword(String newPassword) async {
-    try {
-      final user = _firebaseAuth.currentUser;
-      if (user == null) throw Exception('No user signed in');
-      
-      await user.updatePassword(newPassword);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   Future<void> updateEmail(String newEmail) async {
-    try {
-      final user = _firebaseAuth.currentUser;
-      if (user == null) throw Exception('No user signed in');
-      
-      await user.updateEmail(newEmail);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   Future<void> deleteAccount() async {
-    try {
-      final user = _firebaseAuth.currentUser;
-      if (user == null) throw Exception('No user signed in');
-      
-      await user.delete();
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
   }
 
-  String _handleAuthException(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'user-not-found':
-        return 'No user found with this email address.';
-      case 'wrong-password':
-        return 'Wrong password provided.';
-      case 'email-already-in-use':
-        return 'An account already exists with this email address.';
-      case 'weak-password':
-        return 'The password provided is too weak.';
-      case 'invalid-email':
-        return 'The email address is not valid.';
-      case 'user-disabled':
-        return 'This user account has been disabled.';
-      case 'too-many-requests':
-        return 'Too many requests. Please try again later.';
-      case 'operation-not-allowed':
-        return 'This operation is not allowed.';
-      default:
-        return e.message ?? 'An unknown error occurred.';
-    }
+  Future<Map<String, dynamic>> signInWithGoogle() async {
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 2));
+    
+    // Always succeed for demo purposes
+    return {
+      'uid': 'google_user_${DateTime.now().millisecondsSinceEpoch}',
+      'email': 'google.user@gmail.com',
+      'displayName': 'Google User',
+      'success': true,
+    };
+  }
+
+  Future<bool> verifyOTP(String otp) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
+    
+    // Accept any 6-digit OTP for demo
+    return otp.length == 6 && RegExp(r'^\d+$').hasMatch(otp);
   }
 }
