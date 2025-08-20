@@ -106,7 +106,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ProductsPage(),
             routes: [
               GoRoute(
-                path: '/:productId',
+                path: ':productId', // Fixed: Removed leading slash
                 name: 'product-detail',
                 builder: (context, state) => ProductDetailPage(
                   productId: state.pathParameters['productId']!,
@@ -130,7 +130,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ChatsPage(),
             routes: [
               GoRoute(
-                path: '/:chatId',
+                path: ':chatId', // Fixed: Removed leading slash
                 name: 'chat-detail',
                 builder: (context, state) => ChatDetailPage(
                   chatId: state.pathParameters['chatId']!,

@@ -36,14 +36,14 @@ dependencies:
   
   # Media & Files
   image_picker: ^1.0.4
-  file_picker: ^6.1.1
-  permission_handler: ^11.1.0
+  file_picker: ^8.0.0
+  permission_handler: ^10.1.0
   
   # AR Features
   ar_flutter_plugin: ^0.7.3
   
   # Maps & Location
-  geolocator: ^10.1.0
+  geolocator: ^9.0.2
   geocoding: ^2.1.1
   
   # Payments
@@ -71,20 +71,17 @@ flutter:
   
   assets:
     - assets/images/
-    - assets/icons/
-    - assets/animations/
-    - assets/ar_models/
   
-  fonts:
-    - family: Poppins
-      fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Poppins-Bold.ttf
-          weight: 700
-    - family: LeckerliOne
-      fonts:
-        - asset: assets/fonts/LeckerliOne-Regular.ttf
+  # fonts:
+  #   - family: Poppins
+  #     fonts:
+  #       - asset: assets/fonts/Poppins-Regular.ttf
+  #       - asset: assets/fonts/Poppins-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Poppins-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Poppins-Bold.ttf
+  #         weight: 700
+  #   - family: LeckerliOne
+  #     fonts:
+  #       - asset: assets/fonts/LeckerliOne-Regular.ttf
