@@ -11,8 +11,9 @@ import 'core/providers/theme_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Hive
+  // Initialize Hive 
   await Hive.initFlutter();
+  //hivee
   
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
