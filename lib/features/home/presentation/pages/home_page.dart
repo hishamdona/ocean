@@ -24,6 +24,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
+        onRefresh: () async {
           _showCreatePostPage(context);
         },
         child: CustomScrollView(
@@ -456,8 +457,24 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _handleShare(int index) {
+    _showShareModal(context, index);
+  }
+
+  void _handleFollow(int index) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Share post $index')),
+      SnackBar(content: Text('Following user from post $index')),
+    );
+  }
+
+  void _handleMessageMe(int index) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Message user from post $index')),
+    );
+  }
+
+  void _handleCommentAttachment(int index) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Add attachment to comment on post $index')),
     );
   }
 
@@ -465,5 +482,341 @@ class _HomePageState extends ConsumerState<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Saved post $index')),
     );
+  }
+
+  void _showShareModal(BuildContext context, int index) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Share Post',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _buildShareOption(context, 'Copy Link', Icons.link),
+                  _buildShareOption(context, 'Threads', Icons.alternate_email),
+                  _buildShareOption(context, 'WhatsApp', Icons.chat),
+                  _buildShareOption(context, 'Pinterest', Icons.push_pin),
+                  _buildShareOption(context, 'X', Icons.close),
+                  _buildShareOption(context, 'Telegram', Icons.send),
+                  _buildShareOption(context, 'Facebook', Icons.facebook),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShareOption(BuildContext context, String title, IconData icon) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: () {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Shared via $title')),
+        );
+      },
+    );
+  }
+
+  void _showCreatePostPage(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Create Post',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // User Avatar and Text Field
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.grey[300],
+                          radius: 20,
+                          child: const Icon(Icons.person),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            maxLines: 4,
+                            decoration: InputDecoration(
+                              hintText: "What's on your mind?",
+                              border: InputBorder.none,
+                              hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Interactive Icons Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildCreatePostOption(context, 'Image', Icons.image, () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Upload images')),
+                          );
+                        }),
+                        _buildCreatePostOption(context, 'Video', Icons.videocam, () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Upload videos')),
+                          );
+                        }),
+                        _buildCreatePostOption(context, 'Response', Icons.people, () {
+                          _showResponseDropdown(context);
+                        }),
+                        _buildCreatePostOption(context, 'Category', Icons.category, () {
+                          _showCategoryDropdown(context);
+                        }),
+                      ],
+                    ),
+                    
+                    const Spacer(),
+                    
+                    // Action Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel'),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Post created successfully')),
+                              );
+                            },
+                            child: const Text('Post'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreatePostOption(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: Column(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showResponseDropdown(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Response Limit'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Set maximum number of responses:'),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<int>(
+              decoration: const InputDecoration(
+                labelText: 'Max Responses',
+              ),
+              items: const [
+                DropdownMenuItem(value: 5, child: Text('5')),
+                DropdownMenuItem(value: 10, child: Text('10')),
+                DropdownMenuItem(value: 15, child: Text('15')),
+                DropdownMenuItem(value: 20, child: Text('20')),
+              ],
+              onChanged: (value) {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Response limit set')),
+              );
+            },
+            child: const Text('Set'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCategoryDropdown(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Product Category'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Select product category:'),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<ProductCategory>(
+              decoration: const InputDecoration(
+                labelText: 'Category',
+              ),
+              items: ProductCategory.values.map((category) {
+                return DropdownMenuItem(
+                  value: category,
+                  child: Text(_getCategoryDisplayName(category)),
+                );
+              }).toList(),
+              onChanged: (value) {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Category selected')),
+              );
+            },
+            child: const Text('Select'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getCategoryDisplayName(ProductCategory category) {
+    switch (category) {
+      case ProductCategory.electronics:
+        return 'Electronics';
+      case ProductCategory.fashion:
+        return 'Fashion';
+      case ProductCategory.homeGarden:
+        return 'Home & Garden';
+      case ProductCategory.sportsOutdoors:
+        return 'Sports & Outdoors';
+      case ProductCategory.automotive:
+        return 'Automotive';
+      case ProductCategory.booksMedia:
+        return 'Books & Media';
+      case ProductCategory.healthBeauty:
+        return 'Health & Beauty';
+      case ProductCategory.toysGames:
+        return 'Toys & Games';
+      case ProductCategory.foodBeverages:
+        return 'Food & Beverages';
+      case ProductCategory.industrial:
+        return 'Industrial';
+      case ProductCategory.other:
+        return 'Other';
+    }
   }
 }
