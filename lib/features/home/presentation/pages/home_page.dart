@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/models/product_model.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -21,8 +24,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () async {
-          // TODO: Implement refresh logic
+          _showCreatePostPage(context);
         },
         child: CustomScrollView(
           controller: _scrollController,
@@ -105,62 +107,206 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             title: Text('User $index'),
             subtitle: Text('2 hours ago'),
-            trailing: PopupMenuButton(
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'product_details',
-                  child: ListTile(
-                    leading: Icon(Icons.info_outline),
-                    title: Text('Product Details'),
-                    contentPadding: EdgeInsets.zero,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Follow Button
+                OutlinedButton(
+                  onPressed: () => _handleFollow(index),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(60, 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
+                  child: const Text('Follow'),
                 ),
-                const PopupMenuItem(
-                  value: 'view_ar',
-                  child: ListTile(
-                    leading: Icon(Icons.view_in_ar),
-                    title: Text('View in AR'),
-                    contentPadding: EdgeInsets.zero,
+                const SizedBox(width: 8),
+                // Message Me Button
+                ElevatedButton(
+                  onPressed: () => _handleMessageMe(index),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(80, 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
+                  child: const Text('Message Me'),
                 ),
-                const PopupMenuItem(
-                  value: 'report',
-                  child: ListTile(
-                    leading: Icon(Icons.report_outlined),
-                    title: Text('Report'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
+                const SizedBox(width: 8),
+                // Menu Button
+                PopupMenuButton(
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'product_details',
+                      child: ListTile(
+                        leading: Icon(Icons.info_outline),
+                        title: Text('Product Details'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'view_ar',
+                      child: ListTile(
+                        leading: Icon(Icons.view_in_ar),
+                        title: Text('View in AR'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'report',
+                      child: ListTile(
+                        leading: Icon(Icons.report_outlined),
+                        title: Text('Report'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ],
+                  onSelected: (value) {
+                    _handlePostMenuAction(value.toString(), index);
+                  },
                 ),
               ],
-              onSelected: (value) {
-                _handlePostMenuAction(value.toString(), index);
-              },
             ),
           ),
           
-          // Post Content
+          // Product Details Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'This is a sample post content for post $index. '
-              'It could be about a product, demand, or any social commerce content.',
-              style: Theme.of(context).textTheme.bodyMedium,
+            child: Column(
+              children: [
+                // Row 1: Product Name and Price
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Product Name',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'iPhone 15 Pro Max',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Price',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '\$${(index * 100 + 999).toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 12),
+                
+                // Row 2: Brand and Location
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Brand',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Apple',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Location',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Lagos, Nigeria',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // 2x2 Image Grid
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SizedBox(
+              height: 200,
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                ),
+                itemCount: 4,
+                itemBuilder: (context, imageIndex) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.image,
+                      size: 30,
+                      color: Colors.grey,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           
           const SizedBox(height: 12),
           
-          // Post Image/Media
-          Container(
-            width: double.infinity,
-            height: 200,
-            color: Colors.grey[200],
-            child: const Icon(
-              Icons.image,
-              size: 50,
-              color: Colors.grey,
+          // Post Description
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Brand new iPhone 15 Pro Max in excellent condition. '
+              'Comes with original box, charger, and warranty. '
+              'Perfect for photography enthusiasts and tech lovers.',
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
+          
+          const SizedBox(height: 12),
           
           // Post Actions
           Padding(
@@ -225,6 +371,49 @@ class _HomePageState extends ConsumerState<HomePage> {
                     Icons.bookmark_border,
                     color: Colors.grey[600],
                   ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Comment Input Row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                // User Avatar
+                CircleAvatar(
+                  backgroundColor: Colors.grey[300],
+                  radius: 16,
+                  child: const Icon(Icons.person, size: 16),
+                ),
+                const SizedBox(width: 12),
+                // Comment Input
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Write your comments…',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Attachment Icon
+                IconButton(
+                  icon: Icon(
+                    Icons.attach_file,
+                    color: Colors.grey[600],
+                  ),
+                  onPressed: () => _handleCommentAttachment(index),
                 ),
               ],
             ),

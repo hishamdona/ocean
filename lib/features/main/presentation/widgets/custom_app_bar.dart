@@ -47,32 +47,6 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        // Stories indicator
-        Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.camera_alt_outlined),
-                onPressed: () {
-                  // Handle stories
-                },
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
         // Notifications
         Stack(
           children: [
