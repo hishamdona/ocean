@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -10,6 +11,9 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final ScrollController _scrollController = ScrollController();
+  final Map<int, bool> _isLiked = {};
+  String? _selectedResponse = '5';
+  String? _selectedCategory = 'Electronics';
 
   @override
   void dispose() {
@@ -27,6 +31,33 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: CustomScrollView(
           controller: _scrollController,
           slivers: [
+            SliverAppBar(
+              title: Text(
+                'BUYIT',
+                style: Theme.of(context).appBarTheme.titleTextStyle,
+              ),
+              floating: true,
+              snap: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Search')),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.notifications_none),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Notifications')),
+                    );
+                  },
+                ),
+              ],
+              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            ),
             // Stories Section
             SliverToBoxAdapter(
               child: Container(
@@ -88,6 +119,32 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showCreatePostModal(context),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildImageGrid(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 4,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+        ),
+        itemBuilder: (context, index) {
+          return Container(
+            color: Colors.grey[300],
+            child: const Icon(Icons.image, size: 50, color: Colors.grey),
+          );
+        },
+      ),
     );
   }
 
@@ -105,10 +162,21 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             title: Text('User $index'),
             subtitle: Text('2 hours ago'),
-            trailing: PopupMenuButton(
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'product_details',
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Followed user $index')),
+                    );
+                  },
+                  child: const Text('Follow'),
+                ),
+                PopupMenuButton(
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'product_details',
                   child: ListTile(
                     leading: Icon(Icons.info_outline),
                     title: Text('Product Details'),
@@ -136,9 +204,34 @@ class _HomePageState extends ConsumerState<HomePage> {
                 _handlePostMenuAction(value.toString(), index);
               },
             ),
+          ],
+        ),
           ),
           
           // Post Content
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Messaging user $index')),
+                );
+              },
+              child: const Text('Message Me'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+              ),
+            ),
+          ),
+
+          _buildProductDetails(context, index),
+          const SizedBox(height: 12),
+
+          // Image Grid
+          _buildImageGrid(context),
+          const SizedBox(height: 12),
+
+          // Post Description
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
@@ -147,21 +240,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
-          
           const SizedBox(height: 12),
-          
-          // Post Image/Media
-          Container(
-            width: double.infinity,
-            height: 200,
-            color: Colors.grey[200],
-            child: const Icon(
-              Icons.image,
-              size: 50,
-              color: Colors.grey,
-            ),
-          ),
-          
+
           // Post Actions
           Padding(
             padding: const EdgeInsets.all(16),
@@ -173,8 +253,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.favorite_border,
-                        color: Colors.grey[600],
+                        _isLiked[index] ?? false ? Icons.favorite : Icons.favorite_border,
+                        color: _isLiked[index] ?? false ? Colors.red : Colors.grey[600],
                       ),
                       const SizedBox(width: 4),
                       Text('${(index * 3) + 12}'),
@@ -229,6 +309,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               ],
             ),
           ),
+          _buildCommentInputRow(context),
         ],
       ),
     );
@@ -255,9 +336,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _handleLike(int index) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Liked post $index')),
-    );
+    setState(() {
+      _isLiked[index] = !(_isLiked[index] ?? false);
+    });
   }
 
   void _handleComment(int index) {
@@ -267,14 +348,217 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _handleShare(int index) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Share post $index')),
-    );
+    _showShareModal(context);
   }
 
   void _handleSave(int index) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Saved post $index')),
+    );
+  }
+
+  Widget _buildProductDetails(BuildContext context, int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Product Name: Product $index'),
+              Text('Price: \$${index * 10}'),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Brand: Brand $index'),
+              Text('Location: Location $index'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showShareModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Share to'),
+              const SizedBox(height: 16),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildSocialIcon(FontAwesomeIcons.link, 'Copy Link'),
+                    _buildSocialIcon(FontAwesomeIcons.threads, 'Threads'),
+                    _buildSocialIcon(FontAwesomeIcons.whatsapp, 'WhatsApp'),
+                    _buildSocialIcon(FontAwesomeIcons.pinterest, 'Pinterest'),
+                    _buildSocialIcon(FontAwesomeIcons.xTwitter, 'X'),
+                    _buildSocialIcon(FontAwesomeIcons.telegram, 'Telegram'),
+                    _buildSocialIcon(FontAwesomeIcons.facebook, 'Facebook'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSocialIcon(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, size: 40),
+        const SizedBox(height: 4),
+        Text(label),
+      ],
+    );
+  }
+
+  Widget _buildCommentInputRow(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.grey[300],
+            child: const Icon(Icons.person),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Write your comments…',
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.attach_file),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Attach file')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreatePostModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.grey[300],
+                      child: const Icon(Icons.person),
+                    ),
+                    const SizedBox(width: 12),
+                    Text('User Name'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: "What's on your mind?",
+                    border: InputBorder.none,
+                  ),
+                  maxLines: 5,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildModalAction(Icons.image, 'Image'),
+                    _buildModalAction(Icons.videocam, 'Video'),
+                    DropdownButton<String>(
+                      value: _selectedResponse,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedResponse = newValue;
+                        });
+                      },
+                      items: <String>['5', '10', '15', '20']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                    DropdownButton<String>(
+                      value: _selectedCategory,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedCategory = newValue;
+                        });
+                      },
+                      items: <String>['Electronics', 'Fashion', 'Home', 'Books']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Post created')),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Post'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildModalAction(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, size: 30),
+        const SizedBox(height: 4),
+        Text(label),
+      ],
     );
   }
 }
