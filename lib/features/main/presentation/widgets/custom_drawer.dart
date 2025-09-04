@@ -79,37 +79,37 @@ class CustomDrawer extends ConsumerWidget {
                   context,
                   'Products Demand',
                   Icons.search,
-                  () => _navigateToMarketSurvey(context, 'demand'),
+                  () => context.push('/products-demand'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Distress Sales',
                   Icons.flash_on,
-                  () => _navigateToMarketSurvey(context, 'distress'),
+                  () => context.push('/distress-sales'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Heavy Distributors',
                   Icons.business,
-                  () => _navigateToMarketSurvey(context, 'distributors'),
+                  () => context.push('/heavy-distributors'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Swap Deals',
                   Icons.swap_horiz,
-                  () => _navigateToMarketSurvey(context, 'swap'),
+                  () => context.push('/swap-deals'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Bulk Purchases',
                   Icons.inventory,
-                  () => _navigateToMarketSurvey(context, 'bulk'),
+                  () => context.push('/bulk-purchase'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Auctions',
                   Icons.gavel,
-                  () => _navigateToMarketSurvey(context, 'auctions'),
+                  () => context.push('/auctions'),
                 ),
                 
                 const Divider(),
@@ -175,10 +175,6 @@ class CustomDrawer extends ConsumerWidget {
         onTap();
       },
     );
-  }
-
-  void _navigateToMarketSurvey(BuildContext context, String section) {
-    context.push('/market-survey?section=$section');
   }
 
   void _showSignOutDialog(BuildContext context, WidgetRef ref) {

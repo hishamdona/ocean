@@ -20,6 +20,16 @@ import '../../features/chats/presentation/pages/chat_detail_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/profile/presentation/pages/user_profile_page.dart';
 import '../../features/market_survey/presentation/pages/market_survey_page.dart';
+import '../../features/market_survey/presentation/pages/products_demand_page.dart';
+import '../../features/market_survey/presentation/pages/distress_sales_page.dart';
+import '../../features/market_survey/presentation/pages/heavy_distributors_page.dart';
+import '../../features/market_survey/presentation/pages/swap_deals_page.dart';
+import '../../features/market_survey/presentation/pages/auctions_page.dart';
+import '../../features/market_survey/presentation/pages/swap_vendors_page.dart';
+import '../../features/market_survey/presentation/pages/bulk_purchase_page.dart';
+import '../../features/market_survey/presentation/pages/bulk_purchase_details_page.dart';
+import '../../features/market_survey/presentation/pages/bulk_purchase_waitlist_page.dart';
+import '../../features/market_survey/presentation/pages/bulk_purchase_oops_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -160,6 +170,56 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/market-survey',
         name: 'market-survey',
         builder: (context, state) => const MarketSurveyPage(),
+      ),
+      GoRoute(
+        path: '/products-demand',
+        name: 'products-demand',
+        builder: (context, state) => const ProductsDemandPage(),
+      ),
+      GoRoute(
+        path: '/distress-sales',
+        name: 'distress-sales',
+        builder: (context, state) => const DistressSalesPage(),
+      ),
+      GoRoute(
+        path: '/heavy-distributors',
+        name: 'heavy-distributors',
+        builder: (context, state) => const HeavyDistributorsPage(),
+      ),
+      GoRoute(
+        path: '/swap-deals',
+        name: 'swap-deals',
+        builder: (context, state) => const SwapDealsPage(),
+      ),
+       GoRoute(
+        path: '/auctions',
+        name: 'auctions',
+        builder: (context, state) => const AuctionsPage(),
+      ),
+      GoRoute(
+        path: '/swap-vendors',
+        name: 'swap-vendors',
+        builder: (context, state) => const SwapVendorsPage(),
+      ),
+      GoRoute(
+        path: '/bulk-purchase',
+        name: 'bulk-purchase',
+        builder: (context, state) => const BulkPurchasePage(),
+      ),
+      GoRoute(
+        path: '/bulk-purchase-details',
+        name: 'bulk-purchase-details',
+        builder: (context, state) => const BulkPurchaseDetailsPage(),
+      ),
+      GoRoute(
+        path: '/bulk-purchase-waitlist',
+        name: 'bulk-purchase-waitlist',
+        builder: (context, state) => const BulkPurchaseWaitlistPage(),
+      ),
+      GoRoute(
+        path: '/bulk-purchase-oops',
+        name: 'bulk-purchase-oops',
+        builder: (context, state) => const BulkPurchaseOopsPage(),
       ),
       
       // Settings Routes
