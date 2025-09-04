@@ -20,6 +20,8 @@ import '../../features/chats/presentation/pages/chat_detail_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/profile/presentation/pages/user_profile_page.dart';
 import '../../features/market_survey/presentation/pages/market_survey_page.dart';
+import '../../features/market_survey/presentation/pages/swap_deals_page.dart';
+import '../../features/market_survey/presentation/pages/swap_vendors_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -157,10 +159,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       
       // Market Survey Routes
       GoRoute(
-        path: '/market-survey',
-        name: 'market-survey',
-        builder: (context, state) => const MarketSurveyPage(),
-      ),
+          path: '/market-survey',
+          name: 'market-survey',
+          builder: (context, state) => const MarketSurveyPage(),
+          routes: [
+            GoRoute(
+                path: 'swap-deals',
+                name: 'swap-deals',
+                builder: (context, state) => const SwapDealsPage(),
+                routes: [
+                  GoRoute(
+                    path: 'vendors',
+                    name: 'swap-vendors',
+                    builder: (context, state) => const SwapVendorsPage(),
+                  )
+                ]),
+          ]),
       
       // Settings Routes
       GoRoute(
