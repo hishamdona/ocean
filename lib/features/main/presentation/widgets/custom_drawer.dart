@@ -79,37 +79,37 @@ class CustomDrawer extends ConsumerWidget {
                   context,
                   'Products Demand',
                   Icons.search,
-                  () => context.push('/market-survey/products-demand'),
+                  () => _navigateToMarketSurvey(context, 'demand'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Distress Sales',
                   Icons.flash_on,
-                  () => context.push('/market-survey/distress-sales'),
+                  () => _navigateToMarketSurvey(context, 'distress'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Heavy Distributors',
                   Icons.business,
-                  () => context.push('/market-survey/heavy-distributors'),
+                  () => _navigateToMarketSurvey(context, 'distributors'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Swap Deals',
                   Icons.swap_horiz,
-                  () => context.push('/market-survey/swap-deals'),
+                  () => _navigateToMarketSurvey(context, 'swap'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Bulk Purchases',
                   Icons.inventory,
-                  () => context.push('/market-survey/bulk-purchases'),
+                  () => _navigateToMarketSurvey(context, 'bulk'),
                 ),
                 _buildDrawerItem(
                   context,
                   'Auctions',
                   Icons.gavel,
-                  () => context.push('/market-survey/auctions'),
+                  () => _navigateToMarketSurvey(context, 'auctions'),
                 ),
                 
                 const Divider(),
@@ -175,6 +175,10 @@ class CustomDrawer extends ConsumerWidget {
         onTap();
       },
     );
+  }
+
+  void _navigateToMarketSurvey(BuildContext context, String section) {
+    context.push('/market-survey?section=$section');
   }
 
   void _showSignOutDialog(BuildContext context, WidgetRef ref) {
