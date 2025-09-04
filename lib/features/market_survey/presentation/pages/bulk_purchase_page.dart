@@ -5,21 +5,20 @@ import '../../../main/presentation/widgets/custom_app_bar.dart';
 import '../../../main/presentation/widgets/custom_bottom_navigation_bar.dart';
 import '../../../main/presentation/widgets/custom_drawer.dart';
 
-class SwapDealsPage extends ConsumerStatefulWidget {
-  const SwapDealsPage({super.key});
+class BulkPurchasePage extends ConsumerStatefulWidget {
+  const BulkPurchasePage({super.key});
 
   @override
-  ConsumerState<SwapDealsPage> createState() => _SwapDealsPageState();
+  ConsumerState<BulkPurchasePage> createState() => _BulkPurchasePageState();
 }
 
-class _SwapDealsPageState extends ConsumerState<SwapDealsPage> {
+class _BulkPurchasePageState extends ConsumerState<BulkPurchasePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
 
   String? _selectedCategory;
-  final List<String> _categories = ['Electronics', 'Fashion', 'Vehicles'];
-  final TextEditingController _productController = TextEditingController();
-  final TextEditingController _brandController = TextEditingController();
+  final List<String> _categories = ['Electronics', 'Fashion', 'Groceries'];
+  final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   bool _isFormValid = false;
@@ -27,15 +26,13 @@ class _SwapDealsPageState extends ConsumerState<SwapDealsPage> {
   @override
   void initState() {
     super.initState();
-    _productController.addListener(_validateForm);
-    _brandController.addListener(_validateForm);
+    _productNameController.addListener(_validateForm);
     _descriptionController.addListener(_validateForm);
   }
 
   @override
   void dispose() {
-    _productController.dispose();
-    _brandController.dispose();
+    _productNameController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -71,7 +68,7 @@ class _SwapDealsPageState extends ConsumerState<SwapDealsPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: CustomAppBar(
-        title: 'Swap Deals',
+        title: 'Bulk Purchase',
         onMenuPressed: () => _scaffoldKey.currentState?.openDrawer(),
         onNotificationPressed: () {},
       ),
@@ -84,29 +81,14 @@ class _SwapDealsPageState extends ConsumerState<SwapDealsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUploadSlot(context, 'Upload Image'),
-              const SizedBox(height: 16),
-              _buildUploadSlot(context, 'Upload Video'),
-              const SizedBox(height: 8),
-              const Text(
-                'Supported formats: jpg, png, mp4',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
+              _buildUploadSlot(context, 'Upload Image/Video (Optional)'),
               const SizedBox(height: 24),
-              TextFormField(
-                controller: _productController,
-                decoration: const InputDecoration(
-                  labelText: 'Product to be swapped',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a product' : null,
-              ),
-              const SizedBox(height: 16),
+              const Center(child: Text('OR')),
+              const SizedBox(height: 24),
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
                 decoration: const InputDecoration(
-                  labelText: 'Category of item to swap to',
+                  labelText: 'Category',
                   border: OutlineInputBorder(),
                 ),
                 hint: const Text('Select category'),
@@ -126,13 +108,13 @@ class _SwapDealsPageState extends ConsumerState<SwapDealsPage> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _brandController,
+                controller: _productNameController,
                 decoration: const InputDecoration(
-                  labelText: 'Brand to be swapped to',
+                  labelText: 'Product name',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) =>
-                    value!.isEmpty ? 'Please enter a brand' : null,
+                    value!.isEmpty ? 'Please enter a product name' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -152,9 +134,9 @@ class _SwapDealsPageState extends ConsumerState<SwapDealsPage> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _isFormValid
-                      ? () => context.push('/market-survey/swap-deals/vendors')
+                      ? () => context.push('/market-survey/bulk-purchase/details')
                       : null,
-                  child: const Text('Submit'),
+                  child: const Text('Search'),
                 ),
               ),
             ],
@@ -180,7 +162,7 @@ class _SwapDealsPageState extends ConsumerState<SwapDealsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            label.contains('Image') ? Icons.image_outlined : Icons.videocam_outlined,
+            Icons.cloud_upload_outlined,
             color: Colors.grey.shade600,
             size: 36,
           ),

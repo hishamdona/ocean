@@ -4,13 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
   final VoidCallback onNotificationPressed;
-  final String? title;
 
   const CustomAppBar({
     super.key,
     required this.onMenuPressed,
     required this.onNotificationPressed,
-    this.title,
   });
 
   @override
@@ -23,33 +21,31 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         icon: const Icon(Icons.menu),
         onPressed: onMenuPressed,
       ),
-      title: title != null
-          ? Text(title!)
-          : Row(
-              children: [
-                // Logo placeholder - replace with actual logo
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.waves,
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Ocean',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
+      title: Row(
+        children: [
+          // Logo placeholder - replace with actual logo
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(8),
             ),
+            child: Icon(
+              Icons.waves,
+              color: Theme.of(context).scaffoldBackgroundColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Ocean',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
       actions: [
         // Stories indicator
         Padding(
